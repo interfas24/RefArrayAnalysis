@@ -35,10 +35,12 @@ public:
 class CartesianCS : public ThreeDCoordSysBase
 {
 public:
-	CartesianCS(double x, double y, double z)
+	CartesianCS(double x = 0.0, double y = 0.0, double z = 0.0)
 		: ThreeDCoordSysBase(x, y, z) {}
 
 	CartesianCS(const CartesianCS&) = default;
+	CartesianCS(CartesianCS&&) = default;
+	CartesianCS& operator=(const CartesianCS&) = default;
 	CartesianCS(const SphericalCS&);
 
 	SphericalCS toSpherical() const;
@@ -75,10 +77,12 @@ public:
 class SphericalCS : public ThreeDCoordSysBase
 {
 public:
-	SphericalCS(double r, double t, double p)
+	SphericalCS(double r = 0.0, double t = 0.0, double p = 0.0)
 		: ThreeDCoordSysBase(r, t, p) {}
 
 	SphericalCS(const SphericalCS&) = default;
+	SphericalCS(SphericalCS&&) = default;
+	SphericalCS& operator=(const SphericalCS&) = default;
 	SphericalCS(const CartesianCS&);
 
 	CartesianCS toCartesian() const;

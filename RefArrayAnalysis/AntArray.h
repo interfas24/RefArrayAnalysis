@@ -11,12 +11,19 @@ class AntArrayBase {
 typedef std::vector<std::vector<CartesianCS>> ArrayDistro;
 
 //solver iterate on array
-//units: mm
+//units: m
 class Reflectarray : public AntArrayBase 
 {
 public:
 	Reflectarray(size_t xscale, size_t yscale, double cell_sz, const CartesianCS & fp);
 	Reflectarray(const Reflectarray &) = delete;
+
+	virtual size_t totalCells() const {
+		return _xscale * _yscale;
+	}
+
+	std::vector<CartesianCS>::iterator begin();
+	std::vector<CartesianCS>::iterator end();
 
 protected:
 	size_t _xscale;
@@ -25,7 +32,7 @@ protected:
 	CartesianCS _feed_pos;
 	ArrayDistro _array_info;
 
-	virtual ArrayDistro initArray() = 0;
+	virtual ArrayDistro initArray();
 };
 
 class RectRefArray : public Reflectarray 
@@ -35,7 +42,13 @@ public:
 	RectRefArray(size_t xscale, size_t yscale, double cell_sz, const CartesianCS &fp)
 		: Reflectarray(xscale, yscale, cell_sz, fp) {}
 
+protected:
 	ArrayDistro initArray();
+};
 
-private:
+class SquareRefArray : public RectRefArray
+{
+public:
+	SquareRefArray(size_t scale, double cell_sz, const CartesianCS &fp)
+		: RectRefArray(scale, scale, cell_sz, fp) {}
 };
