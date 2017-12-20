@@ -89,12 +89,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>g:\Libs\Eigen3\Eigen;g:\Libs\GTest\x86\include;g:\Code\C++\Final_prj\base\math_lib\math_lib;g:\Libs\GSL\2.4\x86\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>e:\Libs\Eigen3\Eigen;e:\Libs\GTest\x86\include;e:\Code\C++\Final_prj\base\math_lib\math_lib;e:\Libs\GSL\2.4\x86\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>g:\Libs\GTest\x86\lib;g:\Libs\GSL\2.4\x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>e:\Libs\GTest\x86\lib;e:\Libs\GSL\2.4\x86\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>gsld.lib;gslcblasd.lib;gtestd.lib;gtest_maind.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

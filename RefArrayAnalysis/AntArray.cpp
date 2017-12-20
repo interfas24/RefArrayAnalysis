@@ -21,7 +21,7 @@ ArrayDistro RectRefArray::initArray()
 	}
 
 	ArrayDistro ret;
-	ret.reserve(_yscale);
+	ret.reserve(_xscale * _yscale);
 
 	vector<double> xlist(_xscale);
 	vector<double> ylist(_yscale);
@@ -35,14 +35,9 @@ ArrayDistro RectRefArray::initArray()
 	}
 
 	for (size_t i = 0; i < _yscale; i++) {
-		vector<CartesianCS> row;
-		row.reserve(_xscale);
-
 		for (size_t j = 0; j < _xscale; j++) {
-			row.push_back(CartesianCS(xlist[j], ylist[i], 0.0));
+			ret.push_back(CartesianCS(xlist[j], ylist[i], 0.0));
 		}
-
-		ret.push_back(std::move(row));
 	}
 
 	return ret;

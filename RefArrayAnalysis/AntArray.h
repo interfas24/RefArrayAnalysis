@@ -8,7 +8,7 @@ class AntArrayBase {
 
 //outer vector stands for column along Y axis from -y to +y
 //inner vector stands for column along X axis from -x to +x
-typedef std::vector<std::vector<CartesianCS>> ArrayDistro;
+typedef std::vector<CartesianCS> ArrayDistro;
 
 //solver iterate on array
 //units: m
@@ -22,8 +22,19 @@ public:
 		return _xscale * _yscale;
 	}
 
-	std::vector<CartesianCS>::iterator begin();
-	std::vector<CartesianCS>::iterator end();
+	std::vector<CartesianCS>::iterator begin() {
+		return _array_info.begin();
+	}
+	std::vector<CartesianCS>::iterator end() {
+		return _array_info.end();
+	}
+
+	std::vector<CartesianCS>::const_iterator begin() const {
+		return _array_info.cbegin();
+	}
+	std::vector<CartesianCS>::const_iterator end() const {
+		return _array_info.cend();
+	}
 
 protected:
 	size_t _xscale;
