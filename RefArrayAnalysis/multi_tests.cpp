@@ -5,6 +5,8 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <gsl/gsl_integration.h>
+#include <functional>
 
 using namespace std;
 using namespace gxx_math;
@@ -80,3 +82,64 @@ TEST(Source, Horn) {
 	out.close();
 	*/
 }
+
+/*
+class IntegralTest {
+public:
+	IntegralTest()
+		: horn(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, 10, 2 * M_PI / (3e8 / 4.9e9))
+	{
+		R = 10;
+	}
+
+	double func(double t, void*) {
+		double p = 0;
+		vector<DoubleComplex> rtp = horn.RadiPatternAt(SphericalCS(R, t, p));
+		DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
+		return Abs(ee * ee * R * R * sin(t));
+	}
+
+	double integration() {
+		double p;
+		gsl_function F;
+		//F.function = &IntegralTest::func;
+		F.function = static_cast<double(*)(double, void*)>(&IntegralTest::func);
+
+		double result, abserr;
+		size_t neval;
+		int ret = gsl_integration_qng(&F, 0, M_PI_2, 0.1, 0.1, &result, &abserr, &neval);
+		return result;
+	}
+
+private:
+	PyramidalHorn horn;
+	double R;
+};
+*/
+
+double R = 10;
+PyramidalHorn horn(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, 10, 2 * M_PI / (3e8 / 4.9e9));
+
+double func(double t, void*) {
+	double p = 0;
+	vector<DoubleComplex> rtp = horn.RadiPatternAt(SphericalCS(R, t, p));
+	DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
+	return Abs(ee * ee * R * R * sin(t));
+}
+
+double integration() {
+	gsl_function F;
+	F.function = func;
+
+	double result, abserr;
+	size_t neval;
+	int ret = gsl_integration_qng(&F, 0, M_PI_2, 0.1, 0.1, &result, &abserr, &neval);
+	return result;
+}
+
+TEST(Integral, oned) {
+
+	EXPECT_EQ(integration(), 1.1);
+
+}
+

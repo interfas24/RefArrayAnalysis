@@ -47,7 +47,7 @@ vector<DoubleComplex> PyramidalHorn::RadiPatternAt(const CartesianCS &c)
 	vector<DoubleComplex> rErtp = RadiPatternAt(s);
 
 	//from spherical CS to cartesian CS
-	//Ref IEEE Trans. AP. VOL. AP-27, No.4,JULY 1979
+	//Ref. IEEE Trans. AP. VOL. AP-27, No.4,JULY 1979
 	//Useful Coordinate Transformations for Antenna Applications
 	double t = s.theta(), p = s.phi();
 	vector<vector<double>> convMtrx = {
