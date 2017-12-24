@@ -7,6 +7,8 @@
 
 using namespace std;
 
+ThreeDCoordSysBase OriginalPoint;
+
 namespace cs_internal {
 		
 	vector<double> car2sph(const vector<double>& sph) {

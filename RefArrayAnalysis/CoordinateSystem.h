@@ -15,6 +15,7 @@ class ThreeDCoordSysBase
 protected:
 	std::array<double, 3> _quantity;
 
+public:
 	ThreeDCoordSysBase()
 		: _quantity({0.0, 0.0, 0.0}) {}
 	ThreeDCoordSysBase(double q1, double q2, double q3)
@@ -30,6 +31,14 @@ public:
 	void setQuantity(double q1, double q2, double q3);
 	void setQuantity(const std::vector<double>&);
 	void setQuantity(std::initializer_list<double> li);
+
+	bool operator==(const ThreeDCoordSysBase& other) {
+		return _quantity == other._quantity;
+	}
+
+	bool operator!=(const ThreeDCoordSysBase& other) {
+		return !(*this == other);
+	}
 };
 
 class CartesianCS : public ThreeDCoordSysBase
@@ -115,4 +124,4 @@ public:
 	}
 };
 
-
+extern ThreeDCoordSysBase OriginalPoint;
