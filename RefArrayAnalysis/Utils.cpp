@@ -6,6 +6,7 @@ using namespace std;
 double PhysicsConst::LightSpeed = 299792458.0000;
 double PhysicsConst::VacuumPermit = 8.8541878176 * 1e-12;
 double PhysicsConst::VacuumPermea = 4 * M_PI * 1e-7;
+double PhysicsConst::VacuumImped = sqrt(PhysicsConst::VacuumPermea / PhysicsConst::VacuumPermit);
 
 DoubleComplex SpecialFunc::Fresnel(double x)
 {
@@ -144,4 +145,12 @@ double dB(const gxx_math::DoubleComplex & v, double coeff)
 {
 	double mag = Abs(v);
 	return dB(mag, coeff);
+}
+
+double Sinc(double x)
+{
+	if (x == 0.0)
+		return 1.0;
+	else
+		return sin(x) / x;
 }

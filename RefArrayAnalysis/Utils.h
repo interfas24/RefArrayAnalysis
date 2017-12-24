@@ -9,6 +9,7 @@ public:
 	static double LightSpeed;	//unit : m/s
 	static double VacuumPermit;	//unit : F/m
 	static double VacuumPermea;	//unit : H/m
+	static double VacuumImped;	//unit : ohm
 };
 
 class SpecialFunc
@@ -25,14 +26,16 @@ size_t ArrayLength(const T (&arr)[N])
 
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre);
 
-inline
-double RadToDeg(double rad) {
+inline double RadToDeg(double rad) {
 	return rad * 180. / M_PI;
 }
 
-inline
-double DegToRad(double deg) {
+inline double DegToRad(double deg) {
 	return deg * M_PI / 180.;
+}
+
+inline double mm2m(double mm) {
+	return mm / 1000.0;
 }
 
 inline double Hypot(double x, double y) {
@@ -45,34 +48,8 @@ inline double Hypot(double x, double y, double z) {
 
 std::vector<double> Linspace(double start, double stop, size_t points, bool con_end = true);
 
-/*
-template<typename T>
-double dB(const T&, v, double coeff = 20.)
-{
-	return v <= 0.0 ? 0.0 : coeff * log(v);
-}
-
-template<typename T>
-double dB(const gxx_math::DoubleComplex& v, double coeff)
-{
-	double mag = Abs(v);
-	return dB(mag, coeff);
-}
-*/
-
 double dB(double v, double coeff = 20.);
 double dB(const gxx_math::DoubleComplex &v, double coeff = 20.);
 
-/*
-template<typename T>
-bool DiffLTPrecision(T lhs, T rhs, double pre) {
-	return (abs(lhs - rhs) < pre);
-}
+double Sinc(double x);
 
-template<typename T>
-bool 
-DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre)
-{
-	return (abs(lhs.real() - rhs.real()) < pre) && (abs(lhs.imag() - rhs.imag()) < pre);
-}
-*/

@@ -1,5 +1,6 @@
 #include "Source.h"
 #include "gsl/gsl_math.h"
+#include "gsl/gsl_integration.h"
 #include "GxxComplex.h"
 #include "Utils.h"
 #include <cassert>
@@ -9,6 +10,8 @@ using namespace gxx_math;
 
 namespace source_internal {
 	
+	const double IntegrationPre = 1e-3;
+
 	vector<DoubleComplex> mtrx_mul_vector(const vector<vector<double>>& mtx,
 		const vector<DoubleComplex>& v)
 	{
@@ -27,12 +30,42 @@ namespace source_internal {
 		return ret;
 	}
 
+	double horn_radi_x_func(double x, void *p)
+	{
+		PyramidalHorn *horn = static_cast<PyramidalHorn*>(p);
+		return horn->hornIntegralFunc(x, horn->getReserveNumber());
+	}
+
+	double horn_radi_y_func(double y, void *p)
+	{
+		PyramidalHorn *horn = static_cast<PyramidalHorn*>(p);
+		horn->setReserveNumber(y);
+		gsl_function F;
+		F.function = horn_radi_x_func;
+		F.params = p;
+		double result, abserr;
+		size_t eval;
+		gsl_integration_qng(&F, horn->getThetaRange().first,
+			horn->getThetaRange().second,
+			IntegrationPre, IntegrationPre, &result, &abserr, &eval);
+		return result;
+	}
+
 }
 
-PyramidalHorn::PyramidalHorn(double r1, double r2, double a, double b, double a1, double b1,
-		double E0, double k0)
-		: _r1(r1), _r2(r2), _a(a), _b(b), _a1(a1), _b1(b1), _E0(E0), _k0(k0) 
+PyramidalHorn::PyramidalHorn(double r1, double r2, double a, double b, double a1, double b1, double freq, double E0)
+	: SourceBase(freq),
+	_r1_real(r1),
+	_r2_real(r2),
+	_a_real(a),
+	_b_real(b),
+	_a1_real(a1),
+	_b1_real(b1),
+	_theta_range({0, M_PI_2}),
+	_phi_range({0, 2 * M_PI}),
+	_E0(E0)
 {
+	resetHorn(freq);
 }
 
 vector<DoubleComplex> PyramidalHorn::RadiPatternAt(const SphericalCS &s)
@@ -56,6 +89,26 @@ vector<DoubleComplex> PyramidalHorn::RadiPatternAt(const CartesianCS &c)
 		{ cos(t), -sin(t), 0.0 }
 	};
 	return source_internal::mtrx_mul_vector(convMtrx, rErtp);
+}
+
+double PyramidalHorn::hornIntegralFunc(double t, double p)
+{
+	double R = 100.0;
+	vector<DoubleComplex> rtp = RadiPatternAt(SphericalCS(R, t, p));
+	DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
+	return Abs(ee * ee * R * R * sin(t));
+}
+
+void PyramidalHorn::resetHorn(double freq)
+{
+	resetFreq(freq);
+	_r1 = _r1_real / getLambda();
+	_r2 = _r2_real / getLambda();
+	_a = _a_real / getLambda();
+	_b = _b_real / getLambda();
+	_a1 = _a1_real / getLambda();
+	_b1 = _b1_real / getLambda();
+	_totalPowerRadi = _compute_total_power_radiation();
 }
 
 std::pair<DoubleComplex, DoubleComplex>
@@ -93,4 +146,18 @@ PyramidalHorn::_radiation_pattern_at(const SphericalCS &s)
 		(cos(s.phi()) * (1. + cos(s.theta())) * I1 * I2);
 
 	return {Etheta, Ephi};
+}
+
+double PyramidalHorn::_compute_total_power_radiation()
+{
+	gsl_function F;
+	F.function = source_internal::horn_radi_y_func;
+	F.params = this;
+	double result, abserr;
+	size_t eval;
+	gsl_integration_qng(&F, this->getPhiRange().first,
+		this->getPhiRange().second,
+		source_internal::IntegrationPre, 
+		source_internal::IntegrationPre, &result, &abserr, &eval);
+	return result;
 }

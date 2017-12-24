@@ -7,6 +7,7 @@
 #include <fstream>
 #include <gsl/gsl_integration.h>
 #include <functional>
+#include "AntArray.h"
 
 using namespace std;
 using namespace gxx_math;
@@ -49,7 +50,13 @@ TEST(Source, Horn) {
 	double freq = 5e9;
 	double lambda = 3e8 / freq;
 	double k0 = 2 * M_PI / lambda;
-	PyramidalHorn horn(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, 10, k0);
+	PyramidalHorn horn(3.56 * lambda,
+		5.08 * lambda,
+		0.762 * lambda,
+		0.3386 * lambda,
+		1.524 * lambda,
+		1.1854 * lambda,
+		freq, 10);
 	vector<DoubleComplex> E_total = horn.RadiPatternAt(SphericalCS(10, DegToRad(30), DegToRad(25)));
 
 	double pre = 1e-6;
@@ -57,89 +64,13 @@ TEST(Source, Horn) {
 	EXPECT_EQ(DiffLTPrecision(E_total[1], DoubleComplex(-3.86551809, -1.66259236), pre), true);
 	EXPECT_EQ(DiffLTPrecision(E_total[2], DoubleComplex(-8.28963030, -3.56544083), pre), true);
 
-	/*
-	freq = 6e9;
-	lambda = PhysicsConst::LightSpeed / freq;
-	k0 = 2 * M_PI / lambda;
-	double E0 = sqrt(120. * M_PI);
-	PyramidalHorn h(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, E0, k0);
-	vector<double> thetas = Linspace(-90, 90, 91);
-	vector<double> Ertp;
-	double phi = 90;
-	E_total.reserve(thetas.size());
-	for (const double & t : thetas) {
-		SphericalCS s(15, DegToRad(t), DegToRad(phi));
-		vector<DoubleComplex> re_xyz = h.RadiPatternAt(s.toCartesian());
-		DoubleComplex total = Sqrt((re_xyz[0] ^ 2.) + (re_xyz[1] ^ 2.) + (re_xyz[2] ^ 2.));
-		//Ertp.push_back(dB(total));
-		Ertp.push_back(dB(re_xyz[2]));
-	}
-	
-	ofstream out("rEz_90.txt");
-	for (size_t i = 0; i < thetas.size(); i++) {
-		out << thetas[i] << "\t" << Ertp[i] << endl;
-	}
-	out.close();
-	*/
+	//EXPECT_EQ(E_total[1], DoubleComplex(1., 1.));
+	//EXPECT_EQ(E_total[2], DoubleComplex(1., 1.));
+	EXPECT_EQ(horn.getTotalPowerRadi() - 22701.26065042 < pre, true);
+
+	//EXPECT_EQ(horn.getTotalPowerRadi(), 1.);
 }
 
-/*
-class IntegralTest {
-public:
-	IntegralTest()
-		: horn(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, 10, 2 * M_PI / (3e8 / 4.9e9))
-	{
-		R = 10;
-	}
-
-	double func(double t, void*) {
-		double p = 0;
-		vector<DoubleComplex> rtp = horn.RadiPatternAt(SphericalCS(R, t, p));
-		DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
-		return Abs(ee * ee * R * R * sin(t));
-	}
-
-	double integration() {
-		double p;
-		gsl_function F;
-		//F.function = &IntegralTest::func;
-		F.function = static_cast<double(*)(double, void*)>(&IntegralTest::func);
-
-		double result, abserr;
-		size_t neval;
-		int ret = gsl_integration_qng(&F, 0, M_PI_2, 0.1, 0.1, &result, &abserr, &neval);
-		return result;
-	}
-
-private:
-	PyramidalHorn horn;
-	double R;
-};
-*/
-
-double R = 10;
-PyramidalHorn horn(3.56, 5.08, 0.762, 0.3386, 1.524, 1.1854, 10, 2 * M_PI / (3e8 / 4.9e9));
-
-double func(double t, void*) {
-	double p = 0;
-	vector<DoubleComplex> rtp = horn.RadiPatternAt(SphericalCS(R, t, p));
-	DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
-	return Abs(ee * ee * R * R * sin(t));
-}
-
-double integration() {
-	gsl_function F;
-	F.function = func;
-
-	double result, abserr;
-	size_t neval;
-	int ret = gsl_integration_qng(&F, 0, M_PI_2, 0.1, 0.1, &result, &abserr, &neval);
-	return result;
-}
-
-TEST(Integral, oned) {
-
-	EXPECT_EQ(integration(), 1.1);
-
+TEST(Array, distro) {
 }
 
