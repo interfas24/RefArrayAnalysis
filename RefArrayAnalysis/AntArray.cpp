@@ -31,3 +31,21 @@ ArrayDistro RectRefArray::initArray()
 
 	return ret;
 }
+
+void Reflectarray::setupHorn(PyramidalHorn * horn, double alpha, double beta, double gamma, double fdr)
+{
+	_py_horn = horn;
+	_fdr = fdr;
+	_compute_feed_pos(alpha, beta, gamma);
+}
+
+void Reflectarray::updateEulerianAngle(double alpha, double beta, double gamma)
+{
+	_compute_feed_pos(alpha, beta, gamma);
+}
+
+void Reflectarray::_compute_feed_pos(double alpha, double beta, double gamma)
+{
+}
+
+

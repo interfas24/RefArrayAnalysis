@@ -56,10 +56,10 @@ public:
 		return _array_info.end();
 	}
 
-	std::vector<CartesianCS>::const_iterator begin() const {
+	std::vector<CartesianCS>::const_iterator cbegin() const {
 		return _array_info.cbegin();
 	}
-	std::vector<CartesianCS>::const_iterator end() const {
+	std::vector<CartesianCS>::const_iterator cend() const {
 		return _array_info.cend();
 	}
 
@@ -75,7 +75,7 @@ protected:
 
 private:
 	//step1
-	void _compute_feed_pos();
+	void _compute_feed_pos(double alpha, double beta, double gamma);
 
 	//step2
 	
