@@ -6,6 +6,10 @@
 #include <algorithm>
 
 class AntArrayBase {
+public:
+	virtual ~AntArrayBase() {}
+	virtual size_t totalCells() const = 0;
+	virtual double maxScale() const = 0;
 };
 
 //outer vector stands for column along Y axis from -y to +y
@@ -19,7 +23,6 @@ typedef std::vector<CartesianCS> ArrayDistro;
 //step1 : setup horn
 //step2 : pre-calculate Emn (given phase distribution and csv data file)
 //step3 : 
-
 class Reflectarray : public AntArrayBase 
 {
 public:
@@ -29,39 +32,25 @@ public:
 	}
 	Reflectarray(const Reflectarray &) = delete;
 
-	virtual size_t totalCells() const {
-		return _xscale * _yscale;
-	}
+	size_t totalCells() const override { return _xscale * _yscale; }
 
-	double maxScale() const {
-		return std::max(_xscale, _yscale) * _cell_sz;
-	}
+	double maxScale() const override { return std::max(_xscale, _yscale) * _cell_sz; }
 
 	//set feed horn and position
 	//Feed coordinate and Array coordinate conversion defined by Eulerian Angles (Unit : rad)
 	//Ref. IEEE Trans. ON AP. Useful Coordinate Transformation for Antenna Application
 	void setupHorn(PyramidalHorn *horn,
 					double alpha, double beta, double gamma, double fdr);
-	void updateFDR(double fdr) {
-		_fdr = fdr;
-	}
+	void updateFDR(double fdr) { _fdr = fdr; }
 	void updateEulerianAngle(double alpha, double beta, double gamma);
 
 	//set TeTm data and phase distribution method(Freq band)
 
-	std::vector<CartesianCS>::iterator begin() {
-		return _array_info.begin();
-	}
-	std::vector<CartesianCS>::iterator end() {
-		return _array_info.end();
-	}
+	std::vector<CartesianCS>::iterator begin() { return _array_info.begin(); }
+	std::vector<CartesianCS>::iterator end() { return _array_info.end(); }
 
-	std::vector<CartesianCS>::const_iterator cbegin() const {
-		return _array_info.cbegin();
-	}
-	std::vector<CartesianCS>::const_iterator cend() const {
-		return _array_info.cend();
-	}
+	std::vector<CartesianCS>::const_iterator cbegin() const { return _array_info.cbegin(); }
+	std::vector<CartesianCS>::const_iterator cend() const { return _array_info.cend(); }
 
 protected:
 	size_t _xscale;
@@ -78,7 +67,6 @@ private:
 	void _compute_feed_pos(double alpha, double beta, double gamma);
 
 	//step2
-	
 
 	void _recompute_Emn();
 };

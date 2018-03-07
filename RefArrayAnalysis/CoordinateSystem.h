@@ -6,7 +6,6 @@
 
 //three dimensional coordinate system
 
-
 class CartesianCS;
 class SphericalCS;
 
@@ -22,23 +21,18 @@ public:
 		: _quantity({q1, q2, q3}) {}
 
 	ThreeDCoordSysBase(std::initializer_list<double> li);
+	virtual ~ThreeDCoordSysBase() {}
 
 public:
-	std::vector<double> getQuantity() const {
-		return { _quantity[0], _quantity[1], _quantity[2] };
-	}
+	std::vector<double> getQuantity() const { return { _quantity[0], _quantity[1], _quantity[2] }; }
 
 	void setQuantity(double q1, double q2, double q3);
 	void setQuantity(const std::vector<double>&);
 	void setQuantity(std::initializer_list<double> li);
 
-	bool operator==(const ThreeDCoordSysBase& other) {
-		return _quantity == other._quantity;
-	}
+	bool operator==(const ThreeDCoordSysBase& other) { return _quantity == other._quantity; }
 
-	bool operator!=(const ThreeDCoordSysBase& other) {
-		return !(*this == other);
-	}
+	bool operator!=(const ThreeDCoordSysBase& other) { return !(*this == other); }
 };
 
 class CartesianCS : public ThreeDCoordSysBase
@@ -54,32 +48,14 @@ public:
 
 	SphericalCS toSpherical() const;
 
-	double x() const {
-		return _quantity[0];
-	}
+	double x() const { return _quantity[0]; }
+	CartesianCS& x(double _x) { _quantity[0] = _x; return *this; }
 
-	CartesianCS& x(double _x) {
-		_quantity[0] = _x;
-		return *this;
-	}
+	double y() const { return _quantity[1]; }
+	CartesianCS& y(double _y) { _quantity[1] = _y; return *this; }
 
-	double y() const {
-		return _quantity[1];
-	}
-
-	CartesianCS& y(double _y) {
-		_quantity[1] = _y;
-		return *this;
-	}
-
-	double z() const {
-		return _quantity[2];
-	}
-
-	CartesianCS& z(double _z) {
-		_quantity[2] = _z;
-		return *this;
-	}
+	double z() const { return _quantity[2]; }
+	CartesianCS& z(double _z) { _quantity[2] = _z; return *this; } 
 };
 
 // theta phi : unit rad
@@ -96,32 +72,16 @@ public:
 
 	CartesianCS toCartesian() const;
 
-	double r() const {
-		return _quantity[0];
-	}
+	double r() const { return _quantity[0]; }
+	SphericalCS& r(double r_) { _quantity[0] = r_; return *this; }
 
-	SphericalCS& r(double r_) {
-		_quantity[0] = r_;
-		return *this;
-	}
+	double theta() const { return _quantity[1]; }
 
-	double theta() const {
-		return _quantity[1];
-	}
+	SphericalCS& theta(double t_) { _quantity[1] = t_; return *this; }
 
-	SphericalCS& theta(double t_) {
-		_quantity[1] = t_;
-		return *this;
-	}
+	double phi() const { return _quantity[2]; }
 
-	double phi() const {
-		return _quantity[2];
-	}
-
-	SphericalCS& phi(double p_) {
-		_quantity[2] = p_;
-		return *this;
-	}
+	SphericalCS& phi(double p_) { _quantity[2] = p_; return *this; }
 };
 
 extern ThreeDCoordSysBase OriginalPoint;

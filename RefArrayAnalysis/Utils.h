@@ -26,25 +26,15 @@ size_t ArrayLength(const T (&arr)[N])
 
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre);
 
-inline double RadToDeg(double rad) {
-	return rad * 180. / M_PI;
-}
+inline double RadToDeg(double rad) { return rad * 180. / M_PI; }
 
-inline double DegToRad(double deg) {
-	return deg * M_PI / 180.;
-}
+inline double DegToRad(double deg) { return deg * M_PI / 180.; }
 
-inline double mm2m(double mm) {
-	return mm / 1000.0;
-}
+inline double mm2m(double mm) { return mm / 1000.0; }
 
-inline double Hypot(double x, double y) {
-	return sqrt(x*x + y*y);
-}
+inline double Hypot(double x, double y) { return sqrt(x*x + y*y); }
 
-inline double Hypot(double x, double y, double z) {
-	return sqrt(x*x + y*y + z*z);
-}
+inline double Hypot(double x, double y, double z) { return sqrt(x*x + y*y + z*z); }
 
 std::vector<double> Linspace(double start, double stop, size_t points, bool con_end = true);
 

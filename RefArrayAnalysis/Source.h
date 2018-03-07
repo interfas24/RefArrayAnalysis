@@ -9,22 +9,15 @@
 class SourceBase {
 	
 public:
+	virtual ~SourceBase() {}
 	//unit : Hz;
-	SourceBase(double freq) {
-		resetFreq(freq);
-	}
+	SourceBase(double freq) { resetFreq(freq); }
 
-	double getFreq() const {
-		return _freq;
-	}
+	double getFreq() const { return _freq; }
 
-	double getLambda() const {
-		return _lambda;
-	}
+	double getLambda() const { return _lambda; }
 
-	double getWaveNumber0() const {
-		return _k0;
-	}
+	double getWaveNumber0() const { return _k0; }
 
 	void resetFreq(double freq) {
 		_freq = freq;
@@ -53,25 +46,15 @@ public:
 
 	//R set to 100meter
 	double hornIntegralFunc(double t, double p);
-	double getTotalPowerRadi() const {
-		return _totalPowerRadi;
-	}
+	double getTotalPowerRadi() const { return _totalPowerRadi; }
 
-	void setReserveNumber(double tmp) {
-		_reserve_num = tmp;
-	}
+	void setReserveNumber(double tmp) { _reserve_num = tmp; }
 
-	double getReserveNumber() const {
-		return _reserve_num;
-	}
+	double getReserveNumber() const { return _reserve_num; }
 
-	std::pair<double, double> getThetaRange() const {
-		return _theta_range;
-	}
+	std::pair<double, double> getThetaRange() const { return _theta_range; }
 
-	std::pair<double, double> getPhiRange() const {
-		return _phi_range;
-	}
+	std::pair<double, double> getPhiRange() const { return _phi_range; }
 
 	void resetHorn(double freq);
 

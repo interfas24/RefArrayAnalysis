@@ -3,6 +3,10 @@
 
 using namespace std;
 
+namespace antarray_internal {
+	
+}
+
 ArrayDistro RectRefArray::initArray()
 {
 	if (_xscale < 2 || _yscale < 2) {
