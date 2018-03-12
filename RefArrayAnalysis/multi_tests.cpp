@@ -34,16 +34,16 @@ TEST(CS, CSConverter) {
 	CartesianCS car{ 1., 2., 3. };
 	SphericalCS sph(car);
 
-	EXPECT_DOUBLE_EQ(car.x(), sph.toCartesian().x());
-	EXPECT_DOUBLE_EQ(car.y(), sph.toCartesian().y());
-	EXPECT_DOUBLE_EQ(car.z(), sph.toCartesian().z());
+	EXPECT_DOUBLE_EQ(car.X(), sph.ToCartesian().X());
+	EXPECT_DOUBLE_EQ(car.Y(), sph.ToCartesian().Y());
+	EXPECT_DOUBLE_EQ(car.Z(), sph.ToCartesian().Z());
 
-	sph.r(5.).theta(DegToRad(30)).phi(DegToRad(45));
-	car = sph.toCartesian();
+	sph.R(5.).Theta(DegToRad(30)).Phi(DegToRad(45));
+	car = sph.ToCartesian();
 
-	EXPECT_DOUBLE_EQ(sph.r(), car.toSpherical().r());
-	EXPECT_DOUBLE_EQ(sph.theta(), car.toSpherical().theta());
-	EXPECT_DOUBLE_EQ(sph.phi(), car.toSpherical().phi());
+	EXPECT_DOUBLE_EQ(sph.R(), car.ToSpherical().R());
+	EXPECT_DOUBLE_EQ(sph.Theta(), car.ToSpherical().Theta());
+	EXPECT_DOUBLE_EQ(sph.Phi(), car.ToSpherical().Phi());
 }
 
 TEST(Source, Horn) {
@@ -57,7 +57,7 @@ TEST(Source, Horn) {
 		1.524 * lambda,
 		1.1854 * lambda,
 		freq, 10);
-	vector<DoubleComplex> E_total = horn.RadiPatternAt(SphericalCS(10, DegToRad(30), DegToRad(25)));
+	vector<DoubleComplex> E_total = horn.RadiationPatternAt(SphericalCS(10, DegToRad(30), DegToRad(25)));
 
 	double pre = 1e-6;
 	EXPECT_EQ(DiffLTPrecision(E_total[0], DoubleComplex(0.0, 0.0), pre), true);
@@ -66,8 +66,7 @@ TEST(Source, Horn) {
 
 	//EXPECT_EQ(E_total[1], DoubleComplex(1., 1.));
 	//EXPECT_EQ(E_total[2], DoubleComplex(1., 1.));
-	EXPECT_EQ(horn.getTotalPowerRadi() - 22701.26065042 < pre, true);
-
+	EXPECT_EQ(horn.GetTotalRadiationPower() - 22701.26065042 < pre, true);
 	//EXPECT_EQ(horn.getTotalPowerRadi(), 1.);
 }
 

@@ -4,12 +4,20 @@
 #include "gsl/gsl_math.h"
 #include <vector>
 
+class NoCopyable {
+public:
+	NoCopyable() = default;
+	virtual ~NoCopyable() = default;
+	NoCopyable(const NoCopyable&) = delete;
+	NoCopyable& operator=(const NoCopyable&) = delete;
+};
+
 class PhysicsConst {
 public:
-	static double LightSpeed;	//unit : m/s
-	static double VacuumPermit;	//unit : F/m
-	static double VacuumPermea;	//unit : H/m
-	static double VacuumImped;	//unit : ohm
+	static const double LightSpeed;	//unit : m/s
+	static const double VacuumPermit;	//unit : F/m
+	static const double VacuumPermea;	//unit : H/m
+	static const double VacuumImped;	//unit : ohm
 };
 
 class SpecialFunc
@@ -23,6 +31,15 @@ size_t ArrayLength(const T (&arr)[N])
 {
 	return N;
 }
+
+// not very suitable
+struct SourcePosition
+{
+	double Alpha;
+	double Beta;
+	double Gamma;
+	double Distance;
+};
 
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre);
 

@@ -3,10 +3,10 @@
 using namespace gxx_math;
 using namespace std;
 
-double PhysicsConst::LightSpeed = 299792458.0000;
-double PhysicsConst::VacuumPermit = 8.8541878176 * 1e-12;
-double PhysicsConst::VacuumPermea = 4 * M_PI * 1e-7;
-double PhysicsConst::VacuumImped = sqrt(PhysicsConst::VacuumPermea / PhysicsConst::VacuumPermit);
+const double PhysicsConst::LightSpeed = 299792458.0000;
+const double PhysicsConst::VacuumPermit = 8.8541878176 * 1e-12;
+const double PhysicsConst::VacuumPermea = 4 * M_PI * 1e-7;
+const double PhysicsConst::VacuumImped = sqrt(PhysicsConst::VacuumPermea / PhysicsConst::VacuumPermit);
 
 DoubleComplex SpecialFunc::Fresnel(double x)
 {

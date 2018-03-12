@@ -7,7 +7,7 @@
 
 using namespace std;
 
-ThreeDCoordSysBase OriginalPoint;
+//ThreeDCoordSysBase OriginalPoint;
 
 namespace cs_internal {
 		
@@ -31,23 +31,25 @@ namespace cs_internal {
 
 }
 
+ThreeDCoordSysBase ThreeDCoordSysBase::OriginalPoint = ThreeDCoordSysBase();
+
 ThreeDCoordSysBase::ThreeDCoordSysBase(initializer_list<double> li)
 {
-	setQuantity(li);
+	SetQuantity(li);
 }
 
-void ThreeDCoordSysBase::setQuantity(double q1, double q2, double q3)
+void ThreeDCoordSysBase::SetQuantity(double q1, double q2, double q3)
 {
-	setQuantity({ q1, q2, q3 });
+	SetQuantity({ q1, q2, q3 });
 }
 
-void ThreeDCoordSysBase::setQuantity(const std::vector<double>& dat)
+void ThreeDCoordSysBase::SetQuantity(const std::vector<double>& dat)
 {
 	assert(dat.size() == 3);
-	setQuantity({ dat[0], dat[1], dat[2] });
+	SetQuantity({ dat[0], dat[1], dat[2] });
 }
 
-void ThreeDCoordSysBase::setQuantity(initializer_list<double> li)
+void ThreeDCoordSysBase::SetQuantity(initializer_list<double> li)
 {
 	assert(li.size() == 3);
 	copy(li.begin(), li.end(), _quantity.begin());
@@ -55,20 +57,20 @@ void ThreeDCoordSysBase::setQuantity(initializer_list<double> li)
 
 CartesianCS::CartesianCS(const SphericalCS &sph)
 {
-	setQuantity(cs_internal::sph2car(sph.getQuantity()));
+	SetQuantity(cs_internal::sph2car(sph.GetQuantity()));
 }
 
-SphericalCS CartesianCS::toSpherical() const
+SphericalCS CartesianCS::ToSpherical() const
 {
 	return SphericalCS(*this);
 }
 
 SphericalCS::SphericalCS(const CartesianCS &car)
 {
-	setQuantity(cs_internal::car2sph(car.getQuantity()));
+	SetQuantity(cs_internal::car2sph(car.GetQuantity()));
 }
 
-CartesianCS SphericalCS::toCartesian() const
+CartesianCS SphericalCS::ToCartesian() const
 {
 	return CartesianCS(*this);
 }

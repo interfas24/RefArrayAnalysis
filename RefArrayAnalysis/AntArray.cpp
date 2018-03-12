@@ -3,8 +3,14 @@
 
 using namespace std;
 
-namespace antarray_internal {
-	
+namespace antarray_internal 
+{
+}
+
+void Reflectarray::AddSource(Source *src)
+{
+	_sources.push_back(src);
+	//recompute emn
 }
 
 ArrayDistro RectRefArray::initArray()
@@ -36,14 +42,14 @@ ArrayDistro RectRefArray::initArray()
 	return ret;
 }
 
-void Reflectarray::setupHorn(PyramidalHorn * horn, double alpha, double beta, double gamma, double fdr)
+void Reflectarray::SetupHorn(PyramidalHorn * horn, double alpha, double beta, double gamma, double fdr)
 {
 	_py_horn = horn;
 	_fdr = fdr;
 	_compute_feed_pos(alpha, beta, gamma);
 }
 
-void Reflectarray::updateEulerianAngle(double alpha, double beta, double gamma)
+void Reflectarray::UpdateEulerianAngle(double alpha, double beta, double gamma)
 {
 	_compute_feed_pos(alpha, beta, gamma);
 }
