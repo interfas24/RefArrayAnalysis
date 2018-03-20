@@ -11,7 +11,7 @@ using namespace std;
 
 namespace cs_internal {
 		
-	vector<double> car2sph(const vector<double>& sph) {
+	vector<double> sph2car(const vector<double>& sph) {
 		assert(sph.size() == 3);
 		vector<double> ret(sph.size());
 		ret[0] = sph[0] * sin(sph[1]) * cos(sph[2]);
@@ -20,7 +20,7 @@ namespace cs_internal {
 		return ret;
 	}
 
-	vector<double> sph2car(const vector<double>& car) {
+	vector<double> car2sph(const vector<double>& car) {
 		assert(car.size() == 3);
 		vector<double> ret(car.size());
 		ret[0] = Hypot(car[0], car[1], car[2]);

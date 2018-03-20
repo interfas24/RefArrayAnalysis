@@ -1,16 +1,140 @@
 #include "AntArray.h"
 #include <stdexcept>
+#include <cassert>
 
 using namespace std;
 
 namespace antarray_internal 
 {
+	vector<vector<double>> R2F(double alpha, double beta, double gamma)
+	{
+		vector<vector<double>> ret = {
+			{0, 0, 0},
+			{0, 0, 0},
+			{0, 0, 0}
+		};
+		vector<vector<double>> tmp = ret;
+		vector<vector<double>> mtx1 = {
+			{cos(gamma), sin(gamma), 0},
+			{-sin(gamma), cos(gamma), 0},
+			{0, 0, 1}
+		};
+		vector<vector<double>> mtx2 = {
+			{1, 0, 0},
+			{0, cos(beta), sin(beta)},
+			{0, -sin(beta), cos(beta)}
+		};
+		vector<vector<double>> mtx3 = {
+			{cos(alpha), sin(alpha), 0},
+			{-sin(alpha), cos(alpha), 0},
+			{0, 0, 1}
+		};
+
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
+				for (size_t k = 0; k < 3; k++) {
+					tmp[i][j] += mtx1[i][k] * mtx2[k][j];
+				}
+			}
+		}
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
+				for (size_t k = 0; k < 3; k++) {
+					ret[i][j] += tmp[i][k] * mtx3[k][j];
+				}
+			}
+		}
+
+		return ret;
+	}
+
+	vector<vector<double>> F2R(double alpha, double beta, double gamma)
+	{
+		vector<vector<double>> ret = R2F(alpha, beta, gamma);
+		for (size_t i = 0; i < 3; i++) {
+			for (size_t j = 0; j < 3; j++) {
+				if (i != j) {
+					double tmp = ret[i][j];
+					ret[i][j] = ret[j][i];
+					ret[j][i] = tmp;
+				}
+			}
+		}
+		return ret;
+	}
 }
 
-void Reflectarray::AddSource(Source *src)
+/******************TEST********************/
+vector<double> Reflectarray::Tests()
+{
+	vector<double> ret = { 0., 0., 0. };
+	vector<double> pt = { 1, 2, 3 };
+	double a = _sources[0]->GetPosition().Alpha;
+	double b = _sources[0]->GetPosition().Beta;
+	double g = _sources[0]->GetPosition().Gamma;
+	auto r2f = antarray_internal::R2F(a, b, g);
+	for (size_t i = 0; i < 3; i++) {
+		for (size_t j = 0; j < 3; j++) {
+			ret[i] += r2f[i][j] * pt[j];
+		}
+	}
+	return ret;
+}
+vector<vector<gxx_math::DoubleComplex>> 
+Reflectarray::GetIncidentField() { return _incident_field; }
+/******************TEST********************/
+
+void Reflectarray::AddSource(shared_ptr<Source> src)
 {
 	_sources.push_back(src);
-	//recompute emn
+}
+
+void Reflectarray::ResetSource()
+{
+	_recompute_incident_field();
+}
+
+void Reflectarray::_recompute_incident_field()
+{
+	assert(_sources.size() > 0);
+	_incident_field.clear();
+	_incident_field.resize(TotalCells());
+	for (size_t i = 0; i < TotalCells(); i++)
+		_incident_field[i].resize(3);
+	for (auto src : _sources) {
+		for (size_t i = 0; i < _array_info.size(); i++) {
+			vector<double> pt = { _array_info[i].X(),
+								  _array_info[i].Y(),
+								  0.0 };
+			double a = src->GetPosition().Alpha;
+			double b = src->GetPosition().Beta;
+			double g = src->GetPosition().Gamma;
+			double dis = src->GetPosition().Distance;
+			vector<double> fpt = { 0., 0., 0. };
+			auto r2f = antarray_internal::R2F(a, b, g);
+			for (size_t m = 0; m < 3; m++) {
+				for (size_t n = 0; n < 3; n++) {
+					fpt[m] += r2f[m][n] * pt[n];
+				}
+			}
+			//add z
+			fpt[2] += dis;
+			auto field = src->RadiationPatternAt(CartesianCS(fpt[0], fpt[1], fpt[2]));
+			auto f2r = antarray_internal::F2R(a, b, g);
+			vector<gxx_math::DoubleComplex> rField = { gxx_math::DoubleComplex(),
+													   gxx_math::DoubleComplex(),
+													   gxx_math::DoubleComplex() };
+			for (size_t m = 0; m < 3; m++) {
+				for (size_t n = 0; n < 3; n++) {
+					rField[m] += f2r[m][n] * field[n];
+				}
+			}
+
+			for (size_t m = 0; m < 3; m++) {
+				_incident_field[i][m] += rField[m];
+			}
+		}
+	}
 }
 
 ArrayDistro RectRefArray::initArray()
@@ -33,29 +157,14 @@ ArrayDistro RectRefArray::initArray()
 		ylist[i] = left * _cell_sz + _cell_sz / 2. + i * _cell_sz;
 	}
 
-	for (size_t i = 0; i < _yscale; i++) {
-		for (size_t j = 0; j < _xscale; j++) {
-			ret.push_back(CartesianCS(xlist[j], ylist[i], 0.0));
+	for (size_t row = 0; row < _yscale; row++) {
+		for (size_t col = 0; col < _xscale; col++) {
+			ret.push_back(CartesianCS(xlist[col], ylist[row], 0.0));
 		}
 	}
 
 	return ret;
 }
 
-void Reflectarray::SetupHorn(PyramidalHorn * horn, double alpha, double beta, double gamma, double fdr)
-{
-	_py_horn = horn;
-	_fdr = fdr;
-	_compute_feed_pos(alpha, beta, gamma);
-}
-
-void Reflectarray::UpdateEulerianAngle(double alpha, double beta, double gamma)
-{
-	_compute_feed_pos(alpha, beta, gamma);
-}
-
-void Reflectarray::_compute_feed_pos(double alpha, double beta, double gamma)
-{
-}
 
 

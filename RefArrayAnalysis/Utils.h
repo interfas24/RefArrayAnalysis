@@ -41,6 +41,24 @@ struct SourcePosition
 	double Distance;
 };
 
+// E or H field, in either cartesian or spherical system
+// Cartesian : X Y Z
+// Spherical : R T P
+struct EOrHField
+{
+	gxx_math::DoubleComplex A;
+	gxx_math::DoubleComplex B;
+	gxx_math::DoubleComplex C;
+};
+
+struct CellResponse
+{
+	gxx_math::DoubleComplex TETE;
+	gxx_math::DoubleComplex TETM;
+	gxx_math::DoubleComplex TMTE;
+	gxx_math::DoubleComplex TMTM;
+};
+
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre);
 
 inline double RadToDeg(double rad) { return rad * 180. / M_PI; }
@@ -52,6 +70,10 @@ inline double mm2m(double mm) { return mm / 1000.0; }
 inline double Hypot(double x, double y) { return sqrt(x*x + y*y); }
 
 inline double Hypot(double x, double y, double z) { return sqrt(x*x + y*y + z*z); }
+
+gxx_math::DoubleComplex Hypot(gxx_math::DoubleComplex x,
+								gxx_math::DoubleComplex y,
+								gxx_math::DoubleComplex z);
 
 std::vector<double> Linspace(double start, double stop, size_t points, bool con_end = true);
 

@@ -145,15 +145,21 @@
   <ItemGroup>
     <ClInclude Include="..\..\math_lib\math_lib\GxxComplex.h" />
     <ClInclude Include="AntArray.h" />
+    <ClInclude Include="BeamDistributor.h" />
     <ClInclude Include="CoordinateSystem.h" />
+    <ClInclude Include="Solver.h" />
     <ClInclude Include="Source.h" />
+    <ClInclude Include="Task.h" />
     <ClInclude Include="Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AntArray.cpp" />
+    <ClCompile Include="BeamDistributor.cpp" />
     <ClCompile Include="CoordinateSystem.cpp" />
+    <ClCompile Include="Solver.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="multi_tests.cpp" />
+    <ClCompile Include="Task.cpp" />
     <ClCompile Include="Utils.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

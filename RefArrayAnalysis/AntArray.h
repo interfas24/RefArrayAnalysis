@@ -5,6 +5,7 @@
 #include "Utils.h"
 #include <algorithm>
 #include <vector>
+#include <memory>
 
 class AntArray : public NoCopyable
 {
@@ -13,8 +14,8 @@ public:
 	virtual double MaxScale() const = 0;
 
 protected:
-	std::vector<Source*> _sources;
-	std::vector<gxx_math::DoubleComplex> _Emn;
+	std::vector<std::shared_ptr<Source>> _sources;
+	std::vector<std::vector<gxx_math::DoubleComplex>> _incident_field;
 };
 
 //outer vector stands for column along Y axis from -y to +y
@@ -34,20 +35,23 @@ public:
 	Reflectarray(size_t xscale, size_t yscale, double cell_sz)
 		: _xscale(xscale), _yscale(yscale), _cell_sz(cell_sz)
 	{
+		_incident_field.resize(TotalCells());
+		for (size_t i = 0; i < TotalCells(); i++)
+			_incident_field[i].resize(3);
+		_array_info.resize(TotalCells());
 	}
+
+/******************TEST********************/
+	std::vector<double> Tests();
+	std::vector<std::vector<gxx_math::DoubleComplex>>
+		GetIncidentField();
+	ArrayDistro GetArrayDistro() { return _array_info; }
+/******************TEST********************/
 
 	size_t TotalCells() const override { return _xscale * _yscale; }
 	double MaxScale() const override { return std::max(_xscale, _yscale) * _cell_sz; }
 
-	//set feed horn and position
-	//Feed coordinate and Array coordinate conversion defined by Eulerian Angles (Unit : rad)
-	//Ref. IEEE Trans. ON AP. Useful Coordinate Transformation for Antenna Application
-	void SetupHorn(PyramidalHorn *horn,
-					double alpha, double beta, double gamma, double fdr);
-	void UpdateFDR(double fdr) { _fdr = fdr; }
-	void UpdateEulerianAngle(double alpha, double beta, double gamma);
-
-	void AddSource(Source*);
+	void AddSource(std::shared_ptr<Source> src);
 	void ResetSource();
 
 	//set TeTm data and phase distribution method(Freq band)
@@ -62,16 +66,8 @@ protected:
 	double _cell_sz;
 	ArrayDistro _array_info;
 
-	PyramidalHorn *_py_horn;
-	double _fdr;
-	CartesianCS _feed_pos;
-
 private:
-	//step1
-	void _compute_feed_pos(double alpha, double beta, double gamma);
-
-	//step2
-	void _recompute_Emn();
+	void _recompute_incident_field();
 };
 
 class RectRefArray : public Reflectarray 

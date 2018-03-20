@@ -154,3 +154,11 @@ double Sinc(double x)
 	else
 		return sin(x) / x;
 }
+
+
+DoubleComplex Hypot(gxx_math::DoubleComplex x,
+	gxx_math::DoubleComplex y,
+	gxx_math::DoubleComplex z)
+{
+	return Sqrt(x*x + y*y + z*z);
+}

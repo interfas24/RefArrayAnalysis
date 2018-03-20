@@ -15,8 +15,8 @@ public:
 		RadiationPatternAt(const SphericalCS&) = 0;
 	virtual std::vector<gxx_math::DoubleComplex>
 		RadiationPatternAt(const CartesianCS&) = 0;
-	virtual double GetTotalRadiationPower() const { return _total_radiation_power; }
-	virtual void ResetSource(double freq) { _reset_freq(freq); }
+	double GetTotalRadiationPower() const { return _total_radiation_power; }
+	void ResetSource(double freq) { _reset_freq(freq); }
 
 	double GetFreq() const { return _freq; }
 	double GetLambda() const { return _lambda; }
@@ -34,8 +34,8 @@ protected:
 	void _reset_freq(double freq)
 	{
 		_freq = freq;
-		//_lambda = PhysicsConst::LightSpeed / _freq;
-		_lambda = 3e8 / _freq;
+		_lambda = PhysicsConst::LightSpeed / _freq;
+		//_lambda = 3e8 / _freq;
 		_k0 = 2 * M_PI / _lambda;
 	}
 };
@@ -56,12 +56,12 @@ public:
 
 	//double GetTotalRadiationPower() const { return _total_radiation_power; }
 
-	//R set to 100meter
+	//R set to 100 meters
 	double HornIntegralFunc(double t, double p);
 	std::pair<double, double> GetThetaRange() const { return _theta_range; }
 	std::pair<double, double> GetPhiRange() const { return _phi_range; }
 
-	void ResetSource(double freq) override;
+	void ResetSource(double freq);
 
 private:
 	double _r1;
