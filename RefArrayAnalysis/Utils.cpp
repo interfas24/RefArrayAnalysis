@@ -112,6 +112,56 @@ DoubleComplex SpecialFunc::Fresnel(double x)
 
 }
 
+size_t PhaseStepFuzzifier(const std::vector<double>& pl, double req_phase)
+{
+	// 1st, adjust phase
+	// 2nd, choose from pl
+	bool ascending = pl.front() - pl.back() > 0 ? false : true;
+	double p_cover = abs(pl.front() - pl.back());
+
+	req_phase += (ascending ? pl.front() : pl.back());
+	if (p_cover < 360.)
+		req_phase += (360. - p_cover) / 2.0;
+
+	if (ascending) {
+		if (req_phase < pl.front())
+			return 0;
+		if (req_phase > pl.back())
+			return pl.size() - 1;
+	}
+	else
+	{
+		if (req_phase > pl.front())
+			return 0;
+		if (req_phase < pl.back())
+			return pl.size() - 1;
+	}
+
+	for (size_t i = 0; i < pl.size()-1; i++) {
+		double crt = pl[i];
+		double nxt = pl[i + 1];
+		if (ascending) {
+			if (req_phase > crt && req_phase < nxt) {
+				if (req_phase < abs(nxt - crt) / 2.0)
+					return i;
+				else
+					return i + 1;
+			}
+		}
+		else
+		{
+			if (req_phase < crt && req_phase > nxt) {
+				if (req_phase > abs(nxt - crt) / 2.0)
+					return i;
+				else
+					return i + 1;
+			}
+		}
+	}
+
+	return 0;
+}
+
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre)
 {
 	return (abs(lhs.real() - rhs.real()) < pre) && (abs(lhs.imag() - rhs.imag()) < pre);

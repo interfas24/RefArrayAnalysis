@@ -59,6 +59,10 @@ struct CellResponse
 	gxx_math::DoubleComplex TMTM;
 };
 
+typedef size_t(*PhaseFuzzifier)(const std::vector<double>&, double);
+size_t PhaseInterpFuzzifier(const std::vector<double>&, double);
+size_t PhaseStepFuzzifier(const std::vector<double>&, double);
+
 bool DiffLTPrecision(const gxx_math::DoubleComplex &lhs, const gxx_math::DoubleComplex &rhs, double pre);
 
 inline double RadToDeg(double rad) { return rad * 180. / M_PI; }

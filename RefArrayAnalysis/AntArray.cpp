@@ -94,6 +94,28 @@ void Reflectarray::ResetSource()
 	_recompute_incident_field();
 }
 
+std::vector<CartesianCS> Reflectarray::GetSourcesPos() const
+{
+	vector<CartesianCS> res;
+
+	for (auto pSrc : _sources) {
+		SourcePosition sp = pSrc->GetPosition();
+
+		vector<double> from{ 0., 0., 0. }, to{ 0., 0., 0. };
+		from[2] -= sp.Distance;
+
+		auto f2r = antarray_internal::F2R(sp.Alpha, sp.Beta, sp.Gamma);
+		for (size_t m = 0; m < 3; m++) {
+			for (size_t n = 0; n < 3; n++) {
+				to[m] += f2r[m][n] * from[n];
+			}
+		}
+		res.push_back(CartesianCS(to[0], to[1], to[2]));
+	}
+
+	return res;
+}
+
 void Reflectarray::_recompute_incident_field()
 {
 	assert(_sources.size() > 0);

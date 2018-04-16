@@ -50,9 +50,12 @@ public:
 
 	size_t TotalCells() const override { return _xscale * _yscale; }
 	double MaxScale() const override { return std::max(_xscale, _yscale) * _cell_sz; }
+	size_t XScale() const { return _xscale; }
+	size_t YScale() const { return _yscale; }
 
 	void AddSource(std::shared_ptr<Source> src);
 	void ResetSource();
+	std::vector<CartesianCS> GetSourcesPos() const;
 
 	//set TeTm data and phase distribution method(Freq band)
 	std::vector<CartesianCS>::iterator Begin() { return _array_info.begin(); }

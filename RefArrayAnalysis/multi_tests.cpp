@@ -4,6 +4,7 @@
 #include "Source.h"
 #include "AntArray.h"
 #include "BeamDistributor.h"
+#include "Solver.h"
 
 #include <iostream>
 #include <vector>
@@ -14,6 +15,14 @@
 
 using namespace std;
 using namespace gxx_math;
+
+#define FILE_OUT_PATH	"../../matlab_test/"
+
+string GetFilePath(const string &fn)
+{
+	return string(FILE_OUT_PATH) + fn;
+}
+
 
 TEST(SPFunc, Fresnel) {
 	double pre = 1e-6;
@@ -163,18 +172,80 @@ TEST(Phase, PhaseDistro)
 								 scale / 2. * cell_sz + cell_sz / 2., scale, false);
 	vector<double> xl = yl;
 
-	shared_ptr<VectorSuperposition> feed(new VectorSuperposition(SourceBeam(0., 0., horn_z)));
-	shared_ptr<VectorSuperposition> beam(new VectorSuperposition(PencilBeam(DegToRad(30), DegToRad(0))));
+	ofstream out1(GetFilePath("pencil1.txt"));
+	ofstream out2(GetFilePath("pencil2.txt"));
+	ofstream out3(GetFilePath("oam1.txt"));
+	ofstream out4(GetFilePath("oam2.txt"));
 
-	ofstream out1("pencil1.txt");
+	BeamDistributor b1(freq, SourceBeam(0., 0., horn_z),
+		PencilBeam(DegToRad(20), DegToRad(0)) &
+		PencilBeam(DegToRad(20), DegToRad(180)));
+
+	BeamDistributor b2(freq, SourceBeam(0., 0., horn_z),
+		PencilBeam(DegToRad(30), DegToRad(0)));
+
+	BeamDistributor b3(freq, SourceBeam(0., 0., horn_z),
+		OAMBeam(DegToRad(0), DegToRad(0), 1));
+
+	BeamDistributor b4(freq, SourceBeam(0., 0., horn_z),
+		OAMBeam(DegToRad(0), DegToRad(0), 2));
+
 	for (auto y : yl) {
 		for (auto x : xl) {
-			//BeamDistributor b(freq, x, y, feed, beam);
-			BeamDistributor b(freq, x, y, feed,
-								PencilBeam(DegToRad(20), DegToRad(0)) &
-								PencilBeam(DegToRad(20), DegToRad(180)));
-			out1 << b() << ',';
+			out1 << b1(x, y) << ',';
+			out2 << b2(x, y) << ',';
+			out3 << b3(x, y) << ',';
+			out4 << b4(x, y) << ',';
 		}
 		out1 << '\n';
+		out2 << '\n';
+		out3 << '\n';
+		out4 << '\n';
 	}
+}
+
+TEST(Solver, Basic)
+{
+	int scale = 20;
+	double cell_sz = 30.0 / 1000.;
+	double freq = 5.0e9;
+	double horn_z = cell_sz * scale * 0.8;
+
+	vector<double> yl = Linspace(-scale / 2. * cell_sz + cell_sz / 2.,
+		scale / 2. * cell_sz + cell_sz / 2., scale, false);
+	vector<double> xl = yl;
+
+	double lambda = PhysicsConst::LightSpeed / freq;
+	double k0 = 2 * M_PI / lambda;
+	double E0 = 10.;
+	shared_ptr<Source> pSrc(
+		new PyramidalHorn(
+			3.56 * lambda,
+			5.08 * lambda,
+			0.762 * lambda,
+			0.3386 * lambda,
+			1.524 * lambda,
+			1.1854 * lambda,
+			freq, E0
+		));
+	double fdr = 0.8;
+	double dis = scale * cell_sz * fdr;
+	pSrc->Place({ DegToRad(180), DegToRad(150), DegToRad(0), dis });
+
+	auto parr = shared_ptr<Reflectarray>(new SquareRefArray(scale, cell_sz));
+	parr->AddSource(pSrc);
+	parr->ResetSource();
+
+	for (auto src : parr->GetSourcesPos()) {
+		cout << "(" << src.X() << "," << src.Y() << "," << src.Z() << ")\n";
+	}
+
+	auto pbd = shared_ptr<BeamDistributor>(new BeamDistributor(freq, SourceBeam(0., 0., horn_z),
+		OAMBeam(DegToRad(0), DegToRad(0), 1)));
+
+	Solver s;
+	s.SetArray(parr);
+	s.SetCell("../../test.csv");
+	s.SetPhaseDistributor(pbd);
+	s.SetPhaseFuzzifier(PhaseStepFuzzifier);
 }
