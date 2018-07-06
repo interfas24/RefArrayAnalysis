@@ -81,5 +81,3 @@ public:
 	double Phi() const { return _quantity[2]; }
 	SphericalCS& Phi(double p_) { _quantity[2] = p_; return *this; }
 };
-
-//extern ThreeDCoordSysBase OriginalPoint;

@@ -28,7 +28,6 @@ typedef std::vector<CartesianCS> ArrayDistro;
 //set reflectarray step
 //step1 : setup horn
 //step2 : pre-calculate Emn (given phase distribution and csv data file)
-//step3 : 
 class Reflectarray : public AntArray
 {
 public:
@@ -41,19 +40,19 @@ public:
 		_array_info.resize(TotalCells());
 	}
 
-/******************TEST********************/
 	std::vector<double> Tests();
 	std::vector<std::vector<gxx_math::DoubleComplex>>
 		GetIncidentField();
 	ArrayDistro GetArrayDistro() { return _array_info; }
-/******************TEST********************/
 
 	size_t TotalCells() const override { return _xscale * _yscale; }
 	double MaxScale() const override { return std::max(_xscale, _yscale) * _cell_sz; }
 	size_t XScale() const { return _xscale; }
 	size_t YScale() const { return _yscale; }
+	double CellSize() const { return _cell_sz; }
 
 	void AddSource(std::shared_ptr<Source> src);
+	std::shared_ptr<Source> GetSource() const { return _sources[0]; }
 	void ResetSource();
 	std::vector<CartesianCS> GetSourcesPos() const;
 

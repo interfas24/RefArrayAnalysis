@@ -7,8 +7,6 @@
 
 using namespace std;
 
-//ThreeDCoordSysBase OriginalPoint;
-
 namespace cs_internal {
 		
 	vector<double> sph2car(const vector<double>& sph) {
@@ -23,7 +21,7 @@ namespace cs_internal {
 	vector<double> car2sph(const vector<double>& car) {
 		assert(car.size() == 3);
 		vector<double> ret(car.size());
-		ret[0] = Hypot(car[0], car[1], car[2]);
+		ret[0] = Hypot(car[0], car[1], car[2]) + 1e-15;
 		ret[1] = acos(car[2] / ret[0]);
 		ret[2] = atan2(car[1], car[0]);
 		return ret;

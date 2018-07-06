@@ -5,6 +5,7 @@
 #include "AntArray.h"
 #include "BeamDistributor.h"
 #include "Solver.h"
+#include "Task.h"
 
 #include <iostream>
 #include <vector>
@@ -16,13 +17,12 @@
 using namespace std;
 using namespace gxx_math;
 
-#define FILE_OUT_PATH	"../../matlab_test/"
+#define FILE_OUT_PATH	"../output/"
 
 string GetFilePath(const string &fn)
 {
 	return string(FILE_OUT_PATH) + fn;
 }
-
 
 TEST(SPFunc, Fresnel) {
 	double pre = 1e-6;
@@ -58,52 +58,6 @@ TEST(CS, CSConverter) {
 	EXPECT_DOUBLE_EQ(sph.Phi(), car.ToSpherical().Phi());
 }
 
-TEST(Sources, Horn) {
-	double freq = 5e9;
-	double lambda = 3e8 / freq;
-	double k0 = 2 * M_PI / lambda;
-	PyramidalHorn horn(3.56 * lambda,
-		5.08 * lambda,
-		0.762 * lambda,
-		0.3386 * lambda,
-		1.524 * lambda,
-		1.1854 * lambda,
-		freq, 10);
-	vector<DoubleComplex> E_total = horn.RadiationPatternAt(CartesianCS(0.225, -0.225, 0.4).ToSpherical());
-
-	EXPECT_DOUBLE_EQ(E_total[1].real(), 21.333821518683511);
-	EXPECT_DOUBLE_EQ(E_total[1].imag(), 89.307789828747246);
-	
-	EXPECT_DOUBLE_EQ(E_total[2].real(), -21.333821518683511);
-	EXPECT_DOUBLE_EQ(E_total[2].imag(), -89.307789828747246);
-
-	EXPECT_DOUBLE_EQ(horn.GetTotalRadiationPower(), 22764.839057946094);
-}
-
-TEST(Array, Distro) {
-	double freq = 5e9;
-	double lambda = 3e8 / freq;
-	double k0 = 2 * M_PI / lambda;
-	shared_ptr<Source> pSrc(
-			new PyramidalHorn(
-				3.56 * lambda,
-				5.08 * lambda,
-				0.762 * lambda,
-				0.3386 * lambda,
-				1.524 * lambda,
-				1.1854 * lambda,
-				freq, 10
-			));
-	pSrc->Place({ DegToRad(180), DegToRad(180), DegToRad(0), 1.0 });
-	Reflectarray ref_arr(20, 20, 30 / 1000.);
-	ref_arr.AddSource(pSrc);
-	auto pt = ref_arr.Tests();
-	EXPECT_DOUBLE_EQ(-1.0, pt[0]);
-	EXPECT_DOUBLE_EQ(2.0, pt[1]);
-	EXPECT_DOUBLE_EQ(-3.0, pt[2]);
-}
-
-/*
 TEST(Array, IncidentField) {
 	double freq = 5e9;
 	double lambda = PhysicsConst::LightSpeed / freq;
@@ -143,8 +97,8 @@ TEST(Array, IncidentField) {
 
 	vector<vector<DoubleComplex>> field = arr.GetIncidentField();
 	auto distro = arr.GetArrayDistro();
-	string magFN = "mag2.txt";
-	string phaseFN = "phase2.txt";
+	string magFN = GetFilePath("inc_mag.txt");
+	string phaseFN = GetFilePath("inc_phase.txt");
 	ofstream out1(magFN);
 	ofstream out2(phaseFN);
 	for (size_t i = 0; i < scale; i++) {
@@ -160,7 +114,8 @@ TEST(Array, IncidentField) {
 	out1.close();
 	out2.close();
 }
-*/
+
+
 TEST(Phase, PhaseDistro)
 {
 	int scale = 20;
@@ -204,20 +159,16 @@ TEST(Phase, PhaseDistro)
 	}
 }
 
-TEST(Solver, Basic)
+TEST(Solver, pencilbeam)
 {
 	int scale = 20;
-	double cell_sz = 30.0 / 1000.;
-	double freq = 5.0e9;
-	double horn_z = cell_sz * scale * 0.8;
-
-	vector<double> yl = Linspace(-scale / 2. * cell_sz + cell_sz / 2.,
-		scale / 2. * cell_sz + cell_sz / 2., scale, false);
-	vector<double> xl = yl;
+	double cell_sz = 15.0 / 1000.;
+	double freq = 10.0e9;
 
 	double lambda = PhysicsConst::LightSpeed / freq;
 	double k0 = 2 * M_PI / lambda;
 	double E0 = 10.;
+	double R = 100.;
 	shared_ptr<Source> pSrc(
 		new PyramidalHorn(
 			3.56 * lambda,
@@ -228,24 +179,162 @@ TEST(Solver, Basic)
 			1.1854 * lambda,
 			freq, E0
 		));
-	double fdr = 0.8;
+	double fdr = 1.0;
 	double dis = scale * cell_sz * fdr;
-	pSrc->Place({ DegToRad(180), DegToRad(150), DegToRad(0), dis });
+	double incAngle = 0;
+	pSrc->Place({ DegToRad(180), DegToRad(180 - incAngle), DegToRad(0), dis });
 
 	auto parr = shared_ptr<Reflectarray>(new SquareRefArray(scale, cell_sz));
 	parr->AddSource(pSrc);
 	parr->ResetSource();
 
-	for (auto src : parr->GetSourcesPos()) {
-		cout << "(" << src.X() << "," << src.Y() << "," << src.Z() << ")\n";
-	}
+	CartesianCS pos = parr->GetSourcesPos()[0];
+	
+	auto pbd = shared_ptr<BeamDistributor>(new BeamDistributor(freq, SourceBeam(pos.X(), pos.Y(), pos.Z()),
+		PencilBeam(DegToRad(0), DegToRad(0))));
+	
+	
+	shared_ptr<Gain2D> ptask1(new Gain2D(181, DegToRad(0)));
+	ptask1->SetInputPower(pSrc->GetTotalRadiationPower());
+	shared_ptr<Gain2D> ptask2(new Gain2D(181, DegToRad(90)));
+	ptask2->SetInputPower(pSrc->GetTotalRadiationPower());
+	shared_ptr<Gain3D> ptask3(new Gain3D(181, 181));
+	ptask3->SetInputPower(pSrc->GetTotalRadiationPower());
 
-	auto pbd = shared_ptr<BeamDistributor>(new BeamDistributor(freq, SourceBeam(0., 0., horn_z),
-		OAMBeam(DegToRad(0), DegToRad(0), 1)));
 
 	Solver s;
 	s.SetArray(parr);
-	s.SetCell("../../test.csv");
+	s.SetCell("../input/10G_square_dat.csv");
 	s.SetPhaseDistributor(pbd);
 	s.SetPhaseFuzzifier(PhaseStepFuzzifier);
+	s.AppendTask(ptask1);
+	s.AppendTask(ptask2);
+	s.AppendTask(ptask3);
+	s.Run();
+
+	vector<double> result = ptask1->PostProcess();
+	vector<double> theta = ptask1->GetThetaVec();
+	ofstream out(GetFilePath("t0p0.txt"));
+	for (size_t i = 0; i < result.size(); i++) {
+		out << theta[i] << '\t' << result[i] << '\n';
+	}
+	out.close();
+
+	vector<double> result2 = ptask2->PostProcess();
+	vector<double> theta2 = ptask2->GetThetaVec();
+	ofstream out2(GetFilePath("t0p0_90.txt"));
+	for (size_t i = 0; i < result2.size(); i++) {
+		out2 << theta2[i] << '\t' << result2[i] << '\n';
+	}
+	out2.close();
+
+	vector<vector<double>> result3 = ptask3->PostProcess();
+	vector<double> t = ptask3->GetThetaVec();
+	vector<double> p = ptask3->GetPhiVec();
+	ofstream out3(GetFilePath("t0p0_gain3d.txt"));
+	for (size_t i = 0; i < p.size(); i++)
+	{
+		for (size_t j = 0; j < t.size(); j++)
+		{
+			out3 << result3[i][j] << '\t';
+		}
+		out3 << '\n';
+	}
+	out3.close();
+}
+
+
+TEST(Solver, oambeam)
+{
+	int scale = 20;
+	double cell_sz = 15.0 / 1000.;
+	double freq = 10.0e9;
+
+	double lambda = PhysicsConst::LightSpeed / freq;
+	double k0 = 2 * M_PI / lambda;
+	double E0 = 10.;
+	double R = 100.;
+	shared_ptr<Source> pSrc(
+		new PyramidalHorn(
+			3.56 * lambda,
+			5.08 * lambda,
+			0.762 * lambda,
+			0.3386 * lambda,
+			1.524 * lambda,
+			1.1854 * lambda,
+			freq, E0
+		));
+	double fdr = 1.0;
+	double dis = scale * cell_sz * fdr;
+	double incAngle = 0;
+	pSrc->Place({ DegToRad(180), DegToRad(180 - incAngle), DegToRad(0), dis });
+
+	auto parr = shared_ptr<Reflectarray>(new SquareRefArray(scale, cell_sz));
+	parr->AddSource(pSrc);
+	parr->ResetSource();
+
+	CartesianCS pos = parr->GetSourcesPos()[0];
+
+	auto pbd = shared_ptr<BeamDistributor>(new BeamDistributor(freq, SourceBeam(pos.X(), pos.Y(), pos.Z()),
+	OAMBeam(DegToRad(30), DegToRad(0), 1)));
+
+	shared_ptr<Gain2D> ptask1(new Gain2D(181, DegToRad(0)));
+	ptask1->SetInputPower(pSrc->GetTotalRadiationPower());
+	shared_ptr<Gain3D> ptask2(new Gain3D(181, 181));
+	ptask2->SetInputPower(pSrc->GetTotalRadiationPower());
+
+	shared_ptr<Observe2D> ptask3(new Observe2D(ObservePlane(DegToRad(30),
+		ObservePlane::Y,
+		5.0,
+		{ 1.5, 1.5 },
+		{ 101, 101 })));
+
+	Solver s;
+	s.SetArray(parr);
+	s.SetCell("../input/10G_square_dat.csv");
+	s.SetPhaseDistributor(pbd);
+	s.SetPhaseFuzzifier(PhaseStepFuzzifier);
+	s.AppendTask(ptask1);
+	s.AppendTask(ptask2);
+	s.AppendTask(ptask3);
+	s.Run();
+
+	vector<double> result = ptask1->PostProcess();
+	vector<double> theta = ptask1->GetThetaVec();
+	ofstream out(GetFilePath("t30p0m1.txt"));
+	for (size_t i = 0; i < result.size(); i++) {
+		out << theta[i] << '\t' << result[i] << '\n';
+	}
+	out.close();
+
+	vector<vector<double>> result2 = ptask2->PostProcess();
+	vector<double> t = ptask2->GetThetaVec();
+	vector<double> p = ptask2->GetPhiVec();
+	ofstream out2(GetFilePath("t30p0m1_gain3d.txt"));
+	for (size_t i = 0; i < p.size(); i++)
+	{
+		for (size_t j = 0; j < t.size(); j++)
+		{
+			out2 << result2[i][j] << '\t';
+		}
+		out2 << '\n';
+	}
+	out2.close();
+
+	vector<vector<EOrHField>> result3 = ptask3->PostProcess();
+	ofstream out3m(GetFilePath("t30p0m1_mag.txt"));
+	ofstream out3p(GetFilePath("t30p0m1_phase.txt"));
+	for (size_t i = 0; i < ptask3->GetObservePlane().NXY.first; i++)
+	{
+		for (size_t j = 0; j < ptask3->GetObservePlane().NXY.second; j++)
+		{
+			out3m << Abs(result3[i][j].B) << ',';
+			out3p << RadToDeg(Arg(result3[i][j].B)) << ',';
+		}
+		out3m << '\n';
+		out3p << '\n';
+	}
+	out3m.close();
+	out3p.close();
+
 }

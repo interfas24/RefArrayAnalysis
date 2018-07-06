@@ -14,7 +14,7 @@ public:
 
 class PhysicsConst {
 public:
-	static const double LightSpeed;	//unit : m/s
+	static const double LightSpeed;		//unit : m/s
 	static const double VacuumPermit;	//unit : F/m
 	static const double VacuumPermea;	//unit : H/m
 	static const double VacuumImped;	//unit : ohm

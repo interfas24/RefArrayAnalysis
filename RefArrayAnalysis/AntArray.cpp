@@ -64,25 +64,8 @@ namespace antarray_internal
 	}
 }
 
-/******************TEST********************/
-vector<double> Reflectarray::Tests()
-{
-	vector<double> ret = { 0., 0., 0. };
-	vector<double> pt = { 1, 2, 3 };
-	double a = _sources[0]->GetPosition().Alpha;
-	double b = _sources[0]->GetPosition().Beta;
-	double g = _sources[0]->GetPosition().Gamma;
-	auto r2f = antarray_internal::R2F(a, b, g);
-	for (size_t i = 0; i < 3; i++) {
-		for (size_t j = 0; j < 3; j++) {
-			ret[i] += r2f[i][j] * pt[j];
-		}
-	}
-	return ret;
-}
 vector<vector<gxx_math::DoubleComplex>> 
 Reflectarray::GetIncidentField() { return _incident_field; }
-/******************TEST********************/
 
 void Reflectarray::AddSource(shared_ptr<Source> src)
 {
@@ -153,7 +136,8 @@ void Reflectarray::_recompute_incident_field()
 			}
 
 			for (size_t m = 0; m < 3; m++) {
-				_incident_field[i][m] += rField[m];
+				//_incident_field[i][m] += rField[m];
+				_incident_field[i][m] = rField[m];
 			}
 		}
 	}

@@ -9,7 +9,7 @@
 //unit : Hz;
 class Source : public NoCopyable {
 public:
-	Source(double freq) { _reset_freq(freq); }
+	Source(double freq, double r = 100.0) : _r(r) { _reset_freq(freq); }
 
 	virtual std::vector<gxx_math::DoubleComplex>
 		RadiationPatternAt(const SphericalCS&) = 0;
@@ -23,19 +23,20 @@ public:
 	double GetWaveNumber0() const { return _k0; }
 	void Place(const SourcePosition&);
 	SourcePosition GetPosition() const { return _source_position; }
+	void SetFarFieldR(double r) { _r = r; }
 
 protected:
 	double _freq;
 	double _lambda;
 	double _k0;
 	double _total_radiation_power;
+	double _r;
 	SourcePosition _source_position;
 
 	void _reset_freq(double freq)
 	{
 		_freq = freq;
 		_lambda = PhysicsConst::LightSpeed / _freq;
-		//_lambda = 3e8 / _freq;
 		_k0 = 2 * M_PI / _lambda;
 	}
 };
@@ -53,8 +54,6 @@ public:
 	//Cartesian CS get rE_x_y_z
 	std::vector<gxx_math::DoubleComplex>
 	RadiationPatternAt(const CartesianCS&) override;
-
-	//double GetTotalRadiationPower() const { return _total_radiation_power; }
 
 	//R set to 100 meters
 	double HornIntegralFunc(double t, double p);

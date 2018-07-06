@@ -98,12 +98,13 @@ vector<DoubleComplex> PyramidalHorn::RadiationPatternAt(const CartesianCS &c)
 	return source_internal::mtrx_mul_vector(convMtrx, rErtp);
 }
 
+//
 double PyramidalHorn::HornIntegralFunc(double t, double p)
 {
-	double R = 100.0;
-	vector<DoubleComplex> rtp = RadiationPatternAt(SphericalCS(R, t, p));
+	//double R = 100.0;
+	vector<DoubleComplex> rtp = RadiationPatternAt(SphericalCS(_r, t, p));
 	DoubleComplex ee = Sqrt(rtp[1] * rtp[1] + rtp[2] * rtp[2]);
-	return Abs(ee * ee * R * R * sin(t));
+	return Abs(ee * ee * _r * _r * sin(t));
 }
 
 void PyramidalHorn::ResetSource(double freq)

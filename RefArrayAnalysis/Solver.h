@@ -39,6 +39,13 @@ private:
 	PhaseFuzzifier						fp_;
 	std::list<std::shared_ptr<Task>>	tasks_;
 
+	double px_, py_;
+	size_t Nx_, Ny_;
+	double dx_, dy_;
+	double k0_;
+
 	void load_cell_response_(const std::string& fn);
 	void compute_each_cell_response_();
+	std::pair<gxx_math::DoubleComplex, gxx_math::DoubleComplex> erxy_fft_(double u, double v);
+	std::pair<gxx_math::DoubleComplex, gxx_math::DoubleComplex> emn_(size_t idx);
 };

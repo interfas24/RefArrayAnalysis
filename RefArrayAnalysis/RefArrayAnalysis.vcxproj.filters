@@ -21,9 +21,6 @@
     <ClInclude Include="Utils.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\math_lib\math_lib\GxxComplex.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="CoordinateSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -37,6 +34,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="BeamDistributor.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="GxxComplex.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
