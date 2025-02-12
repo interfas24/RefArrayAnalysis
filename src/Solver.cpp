@@ -4,8 +4,6 @@
 #include <fstream>
 #include <sstream>
 
-#include <fstream>
-
 using namespace std;
 using namespace gxx_math;
 
@@ -39,7 +37,6 @@ void Solver::Run()
 {
 	for (shared_ptr<Task> pTask : tasks_) {
 		pTask->SetStateInfo(Task::Calculating);
-
 		for (size_t i = 0; i < pTask->TaskSize(); i++) {
 			SphericalCS pt = (*pTask)[i].ToSpherical();
 			double r = pt.R();

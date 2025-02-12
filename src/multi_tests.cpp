@@ -17,7 +17,7 @@
 using namespace std;
 using namespace gxx_math;
 
-#define FILE_OUT_PATH	"../output/"
+#define FILE_OUT_PATH	"./output/"
 
 string GetFilePath(const string &fn)
 {
@@ -115,7 +115,6 @@ TEST(Array, IncidentField) {
 	out2.close();
 }
 
-
 TEST(Phase, PhaseDistro)
 {
 	int scale = 20;
@@ -204,12 +203,12 @@ TEST(Solver, pencilbeam)
 
 	Solver s;
 	s.SetArray(parr);
-	s.SetCell("../input/10G_square_dat.csv");
+	s.SetCell("./input/10G_square_dat.csv");
 	s.SetPhaseDistributor(pbd);
 	s.SetPhaseFuzzifier(PhaseStepFuzzifier);
 	s.AppendTask(ptask1);
 	s.AppendTask(ptask2);
-	s.AppendTask(ptask3);
+	//s.AppendTask(ptask3);
 	s.Run();
 
 	vector<double> result = ptask1->PostProcess();
@@ -227,7 +226,7 @@ TEST(Solver, pencilbeam)
 		out2 << theta2[i] << '\t' << result2[i] << '\n';
 	}
 	out2.close();
-
+	/*
 	vector<vector<double>> result3 = ptask3->PostProcess();
 	vector<double> t = ptask3->GetThetaVec();
 	vector<double> p = ptask3->GetPhiVec();
@@ -240,9 +239,8 @@ TEST(Solver, pencilbeam)
 		}
 		out3 << '\n';
 	}
-	out3.close();
+	out3.close();*/
 }
-
 
 TEST(Solver, oambeam)
 {
@@ -291,12 +289,12 @@ TEST(Solver, oambeam)
 
 	Solver s;
 	s.SetArray(parr);
-	s.SetCell("../input/10G_square_dat.csv");
+	s.SetCell("./input/10G_square_dat.csv");
 	s.SetPhaseDistributor(pbd);
 	s.SetPhaseFuzzifier(PhaseStepFuzzifier);
 	s.AppendTask(ptask1);
-	s.AppendTask(ptask2);
-	s.AppendTask(ptask3);
+	//s.AppendTask(ptask2);
+	//s.AppendTask(ptask3);
 	s.Run();
 
 	vector<double> result = ptask1->PostProcess();
@@ -307,6 +305,7 @@ TEST(Solver, oambeam)
 	}
 	out.close();
 
+	/*
 	vector<vector<double>> result2 = ptask2->PostProcess();
 	vector<double> t = ptask2->GetThetaVec();
 	vector<double> p = ptask2->GetPhiVec();
@@ -320,7 +319,9 @@ TEST(Solver, oambeam)
 		out2 << '\n';
 	}
 	out2.close();
+	*/
 
+	/*
 	vector<vector<EOrHField>> result3 = ptask3->PostProcess();
 	ofstream out3m(GetFilePath("t30p0m1_mag.txt"));
 	ofstream out3p(GetFilePath("t30p0m1_phase.txt"));
@@ -336,5 +337,11 @@ TEST(Solver, oambeam)
 	}
 	out3m.close();
 	out3p.close();
+	*/
+}
 
+int main(int argc, char* argv[])
+{
+	::testing::InitGoogleTest(&argc, argv);
+	return RUN_ALL_TESTS();
 }

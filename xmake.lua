@@ -1,0 +1,11 @@
+add_rules("mode.debug", "mode.release")
+add_requires("gtest")
+add_requires("gnu-gsl")
+
+target("Test")
+    set_kind("binary")
+    add_packages("gtest")
+    add_packages("gnu-gsl")
+    add_files("src/**.cpp")
+    add_includedirs("inc/")
+    set_rundir("$(projectdir)")
