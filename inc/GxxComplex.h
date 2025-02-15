@@ -35,19 +35,19 @@ public:
 	}
 
 	T real(const T& re) {
-		return (dat[_RE] = re);
+		return (this->dat[_RE] = re);
 	}
 
 	T real() const {
-		return dat[_RE];
+		return this->dat[_RE];
 	}
 
 	T imag(const T& im) {
-		return (dat[_IM] = im);
+		return (this->dat[_IM] = im);
 	}
 
 	T imag() const {
-		return dat[_IM];
+		return this->dat[_IM];
 	}
 };
 
@@ -87,7 +87,7 @@ public:
 
 	GxxComplex<T>& operator+=(const T& other) 
 	{
-		gsl_complex z = {real(), imag()};
+		gsl_complex z = { this->real(), this->imag() };
 		z = gsl_complex_add_real(z, other);
 		this->real(GSL_REAL(z));
 		this->imag(GSL_IMAG(z));
@@ -95,7 +95,7 @@ public:
 	}
 	GxxComplex<T>& operator+=(const GxxComplex<T>& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		gsl_complex rhs = { other.real(), other.imag() };
 		z = gsl_complex_add(z, rhs);
 		this->real(GSL_REAL(z));
@@ -105,7 +105,7 @@ public:
 
 	GxxComplex<T>& operator-=(const T& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		z = gsl_complex_sub_real(z, other);
 		this->real(GSL_REAL(z));
 		this->imag(GSL_IMAG(z));
@@ -113,7 +113,7 @@ public:
 	}
 	GxxComplex<T>& operator-=(const GxxComplex<T>& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		gsl_complex rhs = { other.real(), other.imag() };
 		z = gsl_complex_sub(z, rhs);
 		this->real(GSL_REAL(z));
@@ -123,7 +123,7 @@ public:
 
 	GxxComplex<T>& operator*=(const T& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		z = gsl_complex_mul_real(z, other);
 		this->real(GSL_REAL(z));
 		this->imag(GSL_IMAG(z));
@@ -131,7 +131,7 @@ public:
 	}
 	GxxComplex<T>& operator*=(const GxxComplex<T>& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		gsl_complex rhs = { other.real(), other.imag() };
 		z = gsl_complex_mul(z, rhs);
 		this->real(GSL_REAL(z));
@@ -141,7 +141,7 @@ public:
 
 	GxxComplex<T>& operator/=(const T& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		z = gsl_complex_div_real(z, other);
 		this->real(GSL_REAL(z));
 		this->imag(GSL_IMAG(z));
@@ -149,7 +149,7 @@ public:
 	}
 	GxxComplex<T>& operator/=(const GxxComplex<T>& other)
 	{
-		gsl_complex z = { real(), imag() };
+		gsl_complex z = { this->real(), this->imag() };
 		gsl_complex rhs = { other.real(), other.imag() };
 		z = gsl_complex_div(z, rhs);
 		this->real(GSL_REAL(z));
